@@ -34,7 +34,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid var(--border-color);
         }
@@ -44,9 +44,30 @@
             font-size: 2.2rem;
             color: var(--accent-color);
             letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        /* 公開資訊區塊樣式 */
+        .public-info-section {
+            margin-bottom: 40px;
+        }
+
+        .section-label {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--accent-color);
+            border-left: 4px solid var(--accent-color);
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* 密碼解鎖區塊樣式 */
         .password-section {
             background-color: var(--card-bg);
             padding: 25px;
@@ -62,7 +83,7 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
 
@@ -113,12 +134,13 @@
         .message.error { color: #b91c1c; }
         .message.success { color: #15803d; }
 
+        /* 線索與選單手風琴列表 */
         .phase-group {
             margin-bottom: 40px;
         }
 
         .phase-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
             color: var(--accent-color);
             border-left: 4px solid var(--accent-color);
@@ -138,7 +160,6 @@
             border-radius: 6px;
             box-shadow: var(--shadow);
             overflow: hidden;
-            transition: border-color 0.2s;
         }
 
         .clue-header {
@@ -150,6 +171,7 @@
             justify-content: space-between;
             align-items: center;
             background-color: #fdfbf7;
+            transition: background-color 0.2s;
         }
 
         .clue-header:hover {
@@ -180,9 +202,37 @@
             padding-left: 15px;
         }
 
+        /* 內容內部格式 */
         b, strong {
             font-weight: 600;
             color: #000;
+        }
+
+        ul {
+            margin: 5px 0 15px 20px;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .grid-table td, .grid-table th {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .grid-table th {
+            background-color: #f4efe6;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -191,24 +241,127 @@
 <div class="container">
     <header>
         <h1>部落疑雲～東谷調查隊</h1>
+        <div class="subtitle">調查員系統與公開檔案資料庫</div>
     </header>
 
+    <!-- 公開檔案區 (無需密碼) -->
+    <div class="public-info-section">
+        <div class="section-label">📋 基礎調查檔案 (點擊展看內文)</div>
+        <div class="clue-list" id="publicInfoContainer">
+            <!-- 由 JS 動態生成公開項目 -->
+        </div>
+    </div>
+
+    <!-- 密碼輸入區 -->
     <div class="password-section">
         <div class="password-input-group">
             <label for="pwdInput">線索密碼：</label>
-            <input type="text" id="pwdInput" placeholder="請輸入密碼" maxlength="5">
+            <input type="text" id="pwdInput" placeholder="輸入5位密碼" maxlength="5">
             <button onclick="unlockClue()">解鎖線索</button>
         </div>
         <div id="message" class="message"></div>
     </div>
 
+    <!-- 階段線索展示區 -->
     <div id="cluesContainer">
-        <!-- 線索將由 JavaScript 動態渲染 -->
+        <!-- 由 JS 動態生成已解鎖線索 -->
     </div>
 </div>
 
 <script>
-// 完整線索資料庫
+// 公開檔案資料庫 (不需要密碼)
+const publicInfoDatabase = [
+    {
+        title: "📌 案情簡述",
+        content: `2026/7/27清晨，有民眾於南投某部落、濁水溪上游支流內，發現一具女性屍體。經法醫勘驗，死者致命傷為胸口槍傷，身份為現年四十七歲女子劉琴秀，生前曾任開發公司經理，牽線十年前某部落開發案。部落中也有傳聞，明年信巨集團將為部落帶來億級觀光開發案，該女子為牽線人。
+
+警方另在劉女家中發現一枚獵槍彈殼與血跡痕跡，停放的手排貨車亦有血跡反應。與此同時，部落裡一對強烈反對開發、曾向死者寄出恐嚇信的年輕情侶（家恩、天樂），目前已被列為嫌疑人移送法辦。
+
+然而日前也傳出案外案：兩名部落少年，田姓和金姓少年在案發後雙雙消失，其中田姓少年是劉女的繼子。此案情撲朔迷離，已有調查人員緊急派遣至當地派出所，期望有所斬獲。`
+    },
+    {
+        title: "👤 人物介紹",
+        content: `<b>【死者與親屬】</b>
+• <b>劉琴秀</b>：死者，田勇國第二任妻子，田俊亦的繼母。因十年前土地案和田勇國相識。
+• <b>田勇國</b>：死者丈夫，田俊亦爸爸，手握多筆土地。多年前得知前妻自殺消息後陷入低潮。
+• <b>林杏岑</b>：田俊亦生母，也曾是當地國小教師，發現丈夫和劉琴秀外遇後離家，傳聞跳樓自殺。
+
+<b>【失蹤少年與家屬】</b>
+• <b>田俊亦</b>：死者繼子，和死者不合，非常思念生母林杏岑，一年前因工安意外斷指。
+• <b>金凱文</b>：和俊亦同為部落山下高中高二，田俊亦好友，和奶奶相依為命。
+• <b>金奶奶</b>：兒子十多年前因貨車車禍亡，漢人媳婦改嫁，只有孫子凱文陪伴。
+
+<b>【部落相關人士】</b>
+• <b>陳星翎</b>：漢人教師，在當地國小任教，後來認識俊亦、凱文後，常常輔導兩人功課。
+• <b>家恩、天樂（遭逮捕）</b>：部落北漂大學生情侶，暑假回鄉後積極抗爭反對信巨集團的土地開發案。`
+    },
+    {
+        title: "⏳ 已知時間軸",
+        content: `• <b>2009年</b>：失蹤少年金凱文、田俊亦之出生年。
+• <b>2016年</b>：劉琴秀當時任職的公司進駐部落勘查。
+• <b>2017年</b>：田勇國出軌劉琴秀。元配林杏岑老師崩潰，憤而離家斷聯。隔年劉琴秀懷孕，放棄工作和田勇國結婚。劉琴秀隨後誕下死胎。
+• <b>2018年</b>：彰化傳出林杏岑老師自殺噩耗，經濟支柱田勇國陷入低潮、酒癮，家庭惡化。
+• <b>2022年</b>：部落長輩帶男孩們第一次上山打獵。
+• <b>2024年</b>：陳星翎老師來到國小任教，同杏岑為漢人女教師，迅速和俊亦、凱文認識。
+• <b>2025年暑假</b>：田俊亦前往台北無照工地打工，遭遇嚴重工安意外，右手大拇指被砸斷。
+• <b>2026年七月中</b>：信巨集團億級開發案在部落傳開。部落輿論不斷，有青年開始抗議、騷擾劉/田家。
+• <b>2026/7/27（今日）</b>：你們是緊急派遣的調查員，來調查兇殺真相、失蹤少年去向。`
+    },
+    {
+        title: "🕒 活動時間表",
+        content: `<table class="grid-table">
+  <tr><th>時間</th><th>地點</th><th>小隊核心任務</th></tr>
+  <tr><td>12:25-12:40</td><td>穿堂</td><td>全體集合、世界觀導讀、領取任務表</td></tr>
+  <tr><td>12:40-13:00</td><td>校園各處</td><td><b>階段一</b>：輪流拜訪3位NPC拿初始證詞（拿完後即可出發）</td></tr>
+  <tr><td>13:00-13:40</td><td>部落走走</td><td><b>階段二</b>：自由移動，合作解鎖十六任務，13:40前抵達派出所</td></tr>
+  <tr><td>13:40-13:50</td><td>派出所</td><td>核對十六宮格，兌換進階刑事線索</td></tr>
+  <tr><td>14:00-14:30</td><td>校園各處</td><td><b>階段三</b>：向3位NPC進行任務核對獲得線索（每關10分鐘）</td></tr>
+  <tr><td>14:30-14:35</td><td>自由時間</td><td>線索消化討論、上洗手間（5分鐘）</td></tr>
+  <tr><td>14:35-15:20</td><td>校園各處</td><td><b>階段四</b>：挑戰3位NPC大關卡獲得線索（每關15分鐘）</td></tr>
+  <tr><td>15:20-15:30</td><td>自由時間</td><td>線索消化討論、上洗手間（10分鐘）。15:30前到圖書館</td></tr>
+  <tr><td>15:30-15:40</td><td>圖書館</td><td><b>階段五</b>：拼湊關鍵電話、現場撥打、獲取自白書</td></tr>
+  <tr><td>15:40-16:10</td><td>圖書館</td><td>各隊討論+發表(10m)、最終投票(3m) ➔ 主控官宣告結局與頒獎(17m)</td></tr>
+</table>`
+    },
+    {
+        title: "🎯 十六任務（部落探索與考驗）",
+        content: `<b>註：粗體字代表需離開學校完成。</b>
+
+<b>【金奶奶的考驗（4選3）】</b>
+• <b>雙龍林道口合照</b>（聽說那裡是俊亦凱文秘密基地附近...）
+• <b>聖保祿天主堂、迪巴恩教會合照</b>（教會的其他孩子應該能給些線索...）
+• <b>麗娜商店合照</b>（聽說老闆娘在案發時有看見些什麼...）
+• <b>老村長店合照</b>（聽說監視器有拍到案發後的關鍵畫面...）
+
+<b>【田勇國的考驗（4選3）】</b>
+• 收集一袋部落和校園垃圾
+• <b>找到部落3個壁畫或圖騰和他合照</b>
+• 說出2個布農族打獵的禁忌/惡兆
+• 說出1個布農族神話或傳說（百步蛇、太陽...）
+
+<b>【陳老師的考驗（4選3）】</b>
+• 說出1種植物的族語和用途
+• <b>拍下紅嘴黑鵯或是其雕塑繪畫，並說出此鳥對布農族的意義</b>
+• <b>說出雙龍屬於哪個社群、「尋根」會去到哪裡</b>
+• 說出2個原住民工安意外案例、其困境和弱勢原因
+
+<b>【其他通用任務】</b>
+• 把構樹葉子貼在別隊的人身上並拍照
+• 指出以下地名的方位、說出族語名：地利/人和/巴庫拉斯
+• 記下所有同隊隊員名字
+• 問出一個小朋友的家在哪並記錄`
+    },
+    {
+        title: "📜 創作聲明與注意事項",
+        content: `• 故事中，駭人兇殺案、酗酒角色、失能家庭、性別霸凌、土地爭端，<b>完全是虛構創作</b>，與現實中溫暖、美麗且充滿生命力的雙龍部落及善良居民，無任何關係，絕無負面影射或不敬之意。
+• 在解謎遊戲設定中，我們難免藉由極端的戲劇衝突和人性陰暗，來堆疊故事的張力。故事中有一酗酒角色田勇國，他是因為前妻自殺、兒子仇視，受到巨大創傷，為了逃避現實、妻子對賣土地的催促，而陷入酒癮，並不代表原住民就應該喝酒；金凱文失去父親的設定，參考自1988年東埔山莊臨時工死亡車禍事件；田俊亦去喝酒之設定，也是因應劇情中某關鍵事件而心情抑鬱之結果。請遊玩過程中，不要因部分設定，就對部落產生負面印象。
+• 總之，我們之所以借用雙龍的地理、文化，作為解謎線索和鋪陳，是希望透過解謎任務更了解雙龍部落、對這裡的文化歷史更加有興趣，並在虛構的悲劇下，去思考原鄉土地觀光之爭、工安意外勞工弱勢、性別霸凌和平權等社會議題背後的無奈。
+• 本故事參考公視雙龍文史紀錄片、網路布農族語資料、吊橋興建新聞、工安意外新聞和相關書摘等。少部分法律資訊經AI建議改動。
+• 版權所有聲明：本解謎遊戲之所有文字與美術排版，智慧財產權皆屬台大東谷沙飛服務社所有。未經授權，嚴禁任何形式之翻印、改作、商業販售或網路公開傳播。`
+    }
+];
+
+// 完整線索資料庫 (需要密碼)
 const cluesDatabase = {
     "47193": {
         phase: "階段一",
@@ -379,18 +532,47 @@ const cluesDatabase = {
 
 const phasesOrder = ["階段一", "階段二", "階段三", "階段四"];
 
-// 從 localStorage 載入已儲存的密碼集合
+// 渲染公開基礎檔案
+function renderPublicInfo() {
+    const container = document.getElementById('publicInfoContainer');
+    container.innerHTML = "";
+
+    publicInfoDatabase.forEach((item, index) => {
+        const infoItem = document.createElement('div');
+        infoItem.className = 'clue-item';
+
+        const infoHeader = document.createElement('div');
+        infoHeader.className = 'clue-header';
+        infoHeader.innerHTML = `<span>${item.title}</span><span class="toggle-icon">▼</span>`;
+
+        const infoBody = document.createElement('div');
+        infoBody.className = 'clue-body';
+        infoBody.innerHTML = item.content;
+
+        infoHeader.addEventListener('click', () => {
+            infoItem.classList.toggle('open');
+            const icon = infoHeader.querySelector('.toggle-icon');
+            icon.textContent = infoItem.classList.contains('open') ? '▲' : '▼';
+        });
+
+        infoItem.appendChild(infoHeader);
+        infoItem.appendChild(infoBody);
+        container.appendChild(infoItem);
+    });
+}
+
+// 從 localStorage 載入已解鎖密碼
 function getUnlockedKeys() {
     const stored = localStorage.getItem('unlockedClues');
     return stored ? JSON.parse(stored) : [];
 }
 
-// 儲存密碼集合至 localStorage
+// 儲存密碼至 localStorage
 function saveUnlockedKeys(keys) {
     localStorage.setItem('unlockedClues', JSON.stringify(keys));
 }
 
-// 解鎖邏輯
+// 解鎖動作
 function unlockClue() {
     const input = document.getElementById('pwdInput');
     const msg = document.getElementById('message');
@@ -407,7 +589,7 @@ function unlockClue() {
         if (!unlockedKeys.includes(pwd)) {
             unlockedKeys.push(pwd);
             saveUnlockedKeys(unlockedKeys);
-            msg.textContent = "解鎖成功！線索已記錄至下方。";
+            msg.textContent = "解鎖成功！線索已加入下方。";
             msg.className = "message success";
             renderClues();
         } else {
@@ -421,14 +603,13 @@ function unlockClue() {
     }
 }
 
-// 畫面渲染邏輯
+// 渲染階段線索區
 function renderClues() {
     const container = document.getElementById('cluesContainer');
     container.innerHTML = "";
     const unlockedKeys = getUnlockedKeys();
 
     phasesOrder.forEach(phase => {
-        // 建立階段外殼
         const phaseGroup = document.createElement('div');
         phaseGroup.className = 'phase-group';
 
@@ -440,7 +621,6 @@ function renderClues() {
         const clueList = document.createElement('div');
         clueList.className = 'clue-list';
 
-        // 篩選屬於該階段且已解鎖的線索
         const matchedKeys = unlockedKeys.filter(key => {
             return cluesDatabase[key] && cluesDatabase[key].phase.startsWith(phase);
         });
@@ -464,7 +644,6 @@ function renderClues() {
                 clueBody.className = 'clue-body';
                 clueBody.innerHTML = clueData.content;
 
-                // 點擊展開/收合
                 clueHeader.addEventListener('click', () => {
                     clueItem.classList.toggle('open');
                     const icon = clueHeader.querySelector('.toggle-icon');
@@ -482,15 +661,16 @@ function renderClues() {
     });
 }
 
-// Enter 鍵觸發解鎖
+// 綁定 Enter 鍵
 document.getElementById('pwdInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         unlockClue();
     }
 });
 
-// 網頁載入時自動渲染
+// 頁面載入初始化
 window.onload = function() {
+    renderPublicInfo();
     renderClues();
 };
 </script>
